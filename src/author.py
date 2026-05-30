@@ -4,4 +4,4 @@ class Author:
         self.last_name: str = last_name
 
     def get_full_name(self) -> str:
-        pass
+        return f"{self.first_name} {self.last_name}"
