@@ -16,6 +16,16 @@ class Library:
         self._next_book_rental_id: int = 1
 
     def add_author(self, first_name: str, last_name: str) -> Author:
+        """ Dodaje nowego autora do biblioteki
+        Args:
+            first_name (str): Imię autora
+            last_name (str): Nazwisko autora
+        Returns:
+            Author: Nowo utworzony obiekt Author
+        Efekt:
+            - Zapisuje autora w `self.authors` z automatycznie przypisanym identyfikatorem
+            - Inkrementuje `self._next_author_id`
+        """
         author = Author(first_name, last_name)
         self.authors[self._next_author_id] = author
         self._next_author_id += 1
