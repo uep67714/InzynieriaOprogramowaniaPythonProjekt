@@ -1,12 +1,18 @@
 from src.author import Author
 
 class Book:
-    def __init__(self, isbn: str, title: str, author: Author, year: int):
-        self.isbn: str = isbn
-        self.title: str = title
+    """Klasa reprezentująca książkę w bibliotece"""
+
+    def __init__(self, book_id: int, isbn: str, title: str, author: Author, year: int) -> None:
+        """
+        Inicjalizuje obiekt książki
+        """
+        self.id = book_id
+        self.isbn = isbn
+        self.title = title
         self.author: Author = author
-        self.year: int = year
-        self.is_available: bool = True
+        self.year = year
+        self.is_available = True
 
     def change_availability(self, status: bool) -> None:
         # task_2
