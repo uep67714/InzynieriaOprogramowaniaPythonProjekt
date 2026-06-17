@@ -16,6 +16,8 @@ class ConsoleController:
                 self._show_add_menu()
             elif choice == "2":
                 self._show_search_menu()
+            elif choice == "3":
+                self._show_rental_menu()
             else:
                 print("Nieprawidłowa opcja, spróbuj jeszcze raz")
 
@@ -23,6 +25,7 @@ class ConsoleController:
         print("\n=== MENU GŁÓWNE ===")
         print("1. Dodawanie")
         print("2. Wyszukiwanie")
+        print("3. Wypożyczenie")
         print("0. Wyjście")
 
     def _show_add_menu(self) -> None:
@@ -49,6 +52,7 @@ class ConsoleController:
             print("\n--- Wyszukiwanie: wybierz typ rekordu ---")
             print("1. Autor")
             print("2. Czytelnik")
+            print("3. Książka")
             print("0. Powrót do menu głównego")
             choice = input("Wybierz akcję: ").strip()
             if choice == "0":
@@ -57,8 +61,23 @@ class ConsoleController:
                 self._search_author()
             elif choice == "2":
                 self._search_reader()
+            elif choice == "3":
+                self._search_book()
             else:
                 print("Nieprawidłowa opcja w menu Wyszukiwanie.")
+
+    def _show_rental_menu(self) -> None:
+        while True:
+            print("\n--- Wypożyczenie: wybierz typ rekordu ---")
+            print("1. Książka")
+            print("0. Powrót do menu głównego")
+            choice = input("Wybierz akcję: ").strip()
+            if choice == "0":
+                return
+            elif choice == "1":
+                self._rent_book()
+            else:
+                print("Nieprawidłowa opcja w menu Wypożyczenie.")
 
     def _add_author(self) -> None:
         print("\n-- Dodawanie nowego autora --")
@@ -143,3 +162,35 @@ class ConsoleController:
             print(f"Znalezieni czytelnicy ({len(readers)}):")
             for reader in readers:
                 print(f"- ID: {reader.id} | {reader.get_full_name()} | E-mail: {reader.email}")
+
+    def _search_book(self) -> None:
+        print("\n-- Wyszukiwanie książki po ISBN --")
+        isbn = input("Podaj numer ISBN: ").strip()
+        if not isbn:
+            print("ISBN nie może być pusty.")
+            return
+
+        books = self.library.find_book_by_isbn(isbn)
+        if not books:
+            print(f"Nie znaleziono książek o ISBN '{isbn}'.")
+        else:
+            print(f"Znalezione egzemplarze ({len(books)}):")
+            for book in books:
+                status = "dostępna" if book.is_available else "wypożyczona"
+                print(f"- ID: {book.id} | '{book.title}' | Autor: {book.author.get_full_name()} | Status: {status}")
+
+    def _rent_book(self) -> None:
+        print("\n-- Wypożyczenie książki --")
+        isbn = input("Podaj numer ISBN: ").strip()
+        reader_id_str = input("Podaj ID czytelnika: ").strip()
+
+        if not isbn or not reader_id_str:
+            print("ISBN i ID czytelnika są wymagane.")
+            return
+
+        try:
+            reader_id = int(reader_id_str)
+            rental = self.library.rent_book(isbn, reader_id)
+            print(f"Wypożyczono książkę '{rental.book.title}' czytelnikowi {rental.reader.get_full_name()}.")
+        except ValueError as exc:
+            print("Nie można wypożyczyć książki:", exc)

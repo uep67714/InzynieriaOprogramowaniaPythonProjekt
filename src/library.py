@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Dict, Optional
 from src.book import Book
 from src.reader import Reader
@@ -89,23 +90,53 @@ class Library:
 
     # task_2
     def rent_book(self, isbn: str, reader_id: int) -> BookRental:
+        """Wypożycza dostępny egzemplarz książki czytelnikowi.
+
+        Czytelnik może mieć maksymalnie jedno aktywne wypożyczenie książki
+        z tym samym numerem ISBN.
+        """
         # find_reader, walidacja
+        if reader_id not in self.readers:
+            raise ValueError(f"Czytelnik o ID {reader_id} nie istnieje.")
+        reader = self.readers[reader_id]
+
+        if self.find_book_rental_by_isbn_and_reader_id(isbn, reader_id) is not None:
+            raise ValueError("Czytelnik ma już aktywne wypożyczenie książki z tym ISBN.")
+
         # find_available, walidacja
+        book = self._find_available_book_by_isbn(isbn)
+        if book is None:
+            raise ValueError(f"Brak dostępnego egzemplarza książki o ISBN {isbn}.")
+
         # new BookRental(), wypożyczenie
+        rental = BookRental(book, reader, datetime.now())
+        self.rentals[self._next_book_rental_id] = rental
+        self._next_book_rental_id += 1
+
         # oznacz książkę jako wypożyczona
-        pass
+        book.change_availability(False)
+        return rental
 
     # task_2
     def _find_available_book_by_isbn(self, isbn: str) -> Optional[Book]:
-        pass
+        """Zwraca pierwszy dostępny egzemplarz książki o podanym ISBN."""
+        for book in self.books.values():
+            if book.isbn == isbn and book.is_available:
+                return book
+        return None
 
     # task_2
     def find_book_by_isbn(self, isbn: str) -> List[Book]:
-        pass
+        """Wyszukuje wszystkie egzemplarze książki o podanym ISBN."""
+        return [book for book in self.books.values() if book.isbn == isbn]
 
     # task_2
     def find_book_rental_by_isbn_and_reader_id(self, isbn: str, reader_id: int) -> Optional[BookRental]:
-        pass
+        """Wyszukuje aktywne wypożyczenie książki po ISBN i ID czytelnika."""
+        for rental in self.rentals.values():
+            if rental.is_active and rental.reader.id == reader_id and rental.book.isbn == isbn:
+                return rental
+        return None
 
     # task_3
     def return_book(self, book_rental_id: int) -> None:
