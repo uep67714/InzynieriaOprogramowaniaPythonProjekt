@@ -1,66 +1,55 @@
-from typing import List, Dict, Optional
-from src.book import Book
-from src.reader import Reader
-from src.book_rental import BookRental
-from src.author import Author
+from typing import List, Optional
+from src.models import Autor, Ksiazka, Czytelnik, Wypozyczenie
 
-class Library:
+class Biblioteka:
     def __init__(self):
-        self.authors: Dict[int, Author] = {}
-        self.books: Dict[int, Book] = {}
-        self.readers: Dict[int, Reader] = {}
-        self.rentals: Dict[int, BookRental] = {}
-        self._next_author_id: int = 1
-        self._next_book_id: int = 1
-        self._next_reader_id: int = 1
-        self._next_book_rental_id: int = 1
+        self.autorzy: List[Autor] = []
+        self.ksiazki: List[Ksiazka] = []
+        self.czytelnicy: List[Czytelnik] = []
+        self.wypozyczenia: List[Wypozyczenie] = []
+        self._nastepne_wypozyczenie_id: int = 1
 
-    def add_author(self, first_name: str, last_name: str) -> Author:
-        author = Author(first_name, last_name)
-        self.authors[self._next_author_id] = author
-        self._next_author_id += 1
-        return author
+    def dodaj_autora(self, autor_id: int, imie: str, nazwisko: str) -> Autor:
+        autor = Autor(autor_id, imie, nazwisko)
+        self.autorzy.append(autor)
+        return autor
 
-    # task_1
-    def add_book(self, author_id: int, isbn: str, title: str, year: int) -> Book:
-        pass
+    def dodaj_ksiazke(self, isbn: str, tytul: str, autor_id: int) -> Optional[Ksiazka]:
+        autor = next((a for a in self.autorzy if a.autor_id == autor_id), None)
+        if not autor: return None
+        ksiazka = Ksiazka(isbn, tytul, autor)
+        self.ksiazki.append(ksiazka)
+        return ksiazka
 
-    # task_1
-    def add_reader(self, first_name: str, last_name: str, email: str) -> Reader:
-        pass
+    def dodaj_czytelnika(self, czytelnik_id: int, imie: str, nazwisko: str) -> Czytelnik:
+        czytelnik = Czytelnik(czytelnik_id, imie, nazwisko)
+        self.czytelnicy.append(czytelnik)
+        return czytelnik
 
-    # task_1
-    def find_reader_by_last_name(self, last_name: str) -> List[Reader]:
-        pass
+    def wypozycz_ksiazke(self, isbn: str, czytelnik_id: int) -> Optional[Wypozyczenie]:
+        czytelnik = next((c for c in self.czytelnicy if c.czytelnik_id == czytelnik_id), None)
+        if not czytelnik: return None
+        nowe_wyp = Wypozyczenie(self._nastepne_wypozyczenie_id, czytelnik_id, isbn)
+        self._nastepne_wypozyczenie_id += 1
+        self.wypozyczenia.append(nowe_wyp)
+        czytelnik.aktywne_wypozyczenia.append(nowe_wyp)
+        return nowe_wyp
 
-    # task_1
-    def find_author_by_last_name(self, last_name: str) -> List[Author]:
-        pass
+   
+    def wyszukaj_numer_wypozyczenia(self, isbn: str, czytelnik_id: int) -> Optional[int]:
+        for wyp in self.wypozyczenia:
+            if wyp.isbn == isbn and wyp.czytelnik_id == czytelnik_id and wyp.status == "aktywne":
+                return wyp.wypozyczenie_id
+        return None
 
-    # task_2
-    def rent_book(self, isbn: str, reader_id: int) -> BookRental:
-        # find_reader, walidacja
-        # find_available, walidacja
-        # new BookRental(), wypożyczenie
-        # oznacz książkę jako wypożyczona
-        pass
+    def zwroc_ksiazke(self, wypozyczenie_id: int) -> bool:
+        wypozyczenie = next((w for w in self.wypozyczenia if w.wypozyczenie_id == wypozyczenie_id and w.status == "aktywne"), None)
+        if not wypozyczenie: return False
+        wypozyczenie.status = "zwrócono"
+        czytelnik = next((c for c in self.czytelnicy if c.czytelnik_id == wypozyczenie.czytelnik_id), None)
+        if czytelnik:
+            czytelnik.aktywne_wypozyczenia = [w for w in czytelnik.aktywne_wypozyczenia if w.wypozyczenie_id != wypozyczenie_id]
+        return True
 
-    # task_2
-    def _find_available_book_by_isbn(self, isbn: str) -> Optional[Book]:
-        pass
-
-    # task_2
-    def find_book_by_isbn(self, isbn: str) -> List[Book]:
-        pass
-
-    # task_2
-    def find_book_rental_by_isbn_and_reader_id(self, isbn: str, reader_id: int) -> Optional[BookRental]:
-        pass
-
-    # task_3
-    def return_book(self, book_rental_id: int) -> None:
-        pass
-
-    # task_4
-    def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
-        pass
+    def wyszukaj_czytelnika_po_id(self, czytelnik_id: int) -> Optional[Czytelnik]:
+        return next((c for c in self.czytelnicy if c.czytelnik_id == czytelnik_id), None)
