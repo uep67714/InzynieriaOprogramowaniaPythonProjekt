@@ -16,4 +16,5 @@ class Book:
 
     def change_availability(self, status: bool) -> None:
         # task_2
-        pass
+        """Ustawia dostępność egzemplarza książki."""
+        self.is_available = status
