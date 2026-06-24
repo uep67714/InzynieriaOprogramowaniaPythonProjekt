@@ -18,6 +18,8 @@ class ConsoleController:
                 self._show_search_menu()
             elif choice == "3":
                 self._show_rental_menu()
+            elif choice == "4":
+                self._return_book()
             else:
                 print("Nieprawidłowa opcja, spróbuj jeszcze raz")
 
@@ -26,6 +28,7 @@ class ConsoleController:
         print("1. Dodawanie")
         print("2. Wyszukiwanie")
         print("3. Wypożyczenie")
+        print("4. Zwrot książki")
         print("0. Wyjście")
 
     def _show_add_menu(self) -> None:
@@ -194,3 +197,16 @@ class ConsoleController:
             print(f"Wypożyczono książkę '{rental.book.title}' czytelnikowi {rental.reader.get_full_name()}.")
         except ValueError as exc:
             print("Nie można wypożyczyć książki:", exc)
+
+    def _return_book(self) -> None:
+        print("\n-- Zwrot książki --")
+        rental_id_str = input("Podaj ID wypożyczenia: ").strip()
+        if not rental_id_str:
+            print("ID wypożyczenia jest wymagane.")
+            return
+        try:
+            rental_id = int(rental_id_str)
+            self.library.return_book(rental_id)
+            print(f"Książka z wypożyczenia o ID {rental_id} została pomyślnie zwrócona do biblioteki.")
+        except ValueError as exc:
+            print("Nie można zwrócić książki:", exc)
