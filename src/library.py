@@ -140,7 +140,16 @@ class Library:
 
     # task_3
     def find_rental_id(self, reader_id: int, isbn: str) -> Optional[int]:
-        """Wyszukuje ID aktywnego wypożyczenia na podstawie ID czytelnika i ISBN książki."""
+        """
+                Wyszukuje ID aktywnego wypożyczenia na podstawie ID czytelnika i ISBN książki.
+
+                Args:
+                    reader_id: ID czytelnika.
+                    isbn: Numer ISBN książki.
+
+                Returns:
+                    ID wypożyczenia (int) lub None, jeśli nie znaleziono.
+                """
         rental = self.find_book_rental_by_isbn_and_reader_id(isbn, reader_id)
         if rental:
             for r_id, r_obj in self.rentals.items():
@@ -151,7 +160,16 @@ class Library:
 
     # task_3
     def return_book(self, book_rental_id: int) -> None:
-        """Rejestruje zwrot książki na podstawie ID wypożyczenia."""
+        """
+        Rejestruje zwrot książki na podstawie ID wypożyczenia.
+        Zmienia status książki na dostępną i wyłącza aktywność wypożyczenia.
+
+        Args:
+            book_rental_id: ID wypożyczenia.
+
+        Raises:
+            ValueError: Jeśli wypożyczenie nie istnieje lub książka już jest zwrócona.
+        """
         if book_rental_id not in self.rentals:
             raise ValueError(f"Wypożyczenie o ID {book_rental_id} nie istnieje.")
         rental = self.rentals[book_rental_id]

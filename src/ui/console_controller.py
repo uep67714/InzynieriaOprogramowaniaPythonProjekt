@@ -165,6 +165,11 @@ class ConsoleController:
             print(f"Znalezieni czytelnicy ({len(readers)}):")
             for reader in readers:
                 print(f"- ID: {reader.id} | {reader.get_full_name()} | E-mail: {reader.email}")
+                active_rentals = [r for r in self.library.rentals.values() if r.reader.id == reader.id and r.is_active]
+                if active_rentals:
+                    print("  Aktualnie wypożyczone książki:")
+                    for rental in active_rentals:
+                        print(f"  * {rental.book.title} (ISBN: {rental.book.isbn})")
 
     def _search_book(self) -> None:
         print("\n-- Wyszukiwanie książki po ISBN --")

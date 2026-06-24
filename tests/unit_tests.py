@@ -145,5 +145,38 @@ class LibraryUnitTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             library.rent_book("978-1", reader.id)
 
+    def test_find_rental_id_success(self):
+        library = Library()
+        author = library.add_author("Henryk", "Sienkiewicz")
+        library.add_book(author.id, "978-1", "Potop", 1886)
+        reader = library.add_reader("Anna", "Nowak", "anna@email.com")
+        rental = library.rent_book("978-1", reader.id)
+        rental_id = library.find_rental_id(reader.id, "978-1")
+        self.assertIsNotNone(rental_id)
+
+    def test_return_book_success(self):
+        # 1. Przygotowanie danych
+        library = Library()
+        author = library.add_author("Henryk", "Sienkiewicz")
+        book = library.add_book(author.id, "978-1", "Potop", 1886)
+        reader = library.add_reader("Anna", "Nowak", "anna@email.com")
+
+        # Używamy podkreślenia "_", aby uniknąć ostrzeżenia o nieużywanej zmiennej
+        _ = library.rent_book("978-1", reader.id)
+
+        # 2. Wyszukanie ID wypożyczenia
+        rental_id = library.find_rental_id(reader.id, "978-1")
+
+        # 3. Weryfikacja: sprawdzamy czy to na pewno int i czy nie jest None
+        self.assertIsInstance(rental_id, int, "rental_id musi być liczbą całkowitą (int)!")
+
+        # 4. Zwrot książki (teraz rental_id jest bezpieczne)
+        library.return_book(rental_id)
+
+        # 5. Sprawdzenie stanu końcowego
+        self.assertTrue(book.is_available, "Książka powinna być dostępna po zwrocie")
+        self.assertFalse(library.rentals[rental_id].is_active, "Wypożyczenie powinno być nieaktywne")
+
+
 if __name__ == '__main__':
     unittest.main()
