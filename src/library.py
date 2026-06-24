@@ -1,147 +1,55 @@
-from datetime import datetime
-from typing import List, Dict, Optional
-from src.book import Book
-from src.reader import Reader
-from src.book_rental import BookRental
-from src.author import Author
+from typing import List, Optional
+from src.models import Autor, Ksiazka, Czytelnik, Wypozyczenie
 
-class Library:
-    def __init__(self) -> None:
-        self.authors: Dict[int, Author] = {}
-        self.books: Dict[int, Book] = {}
-        self.readers: Dict[int, Reader] = {}
-        self.rentals: Dict[int, BookRental] = {}
-        self._next_author_id: int = 1
-        self._next_book_id: int = 1
-        self._next_reader_id: int = 1
-        self._next_book_rental_id: int = 1
+class Biblioteka:
+    def __init__(self):
+        self.autorzy: List[Autor] = []
+        self.ksiazki: List[Ksiazka] = []
+        self.czytelnicy: List[Czytelnik] = []
+        self.wypozyczenia: List[Wypozyczenie] = []
+        self._nastepne_wypozyczenie_id: int = 1
 
-    def add_author(self, first_name: str, last_name: str) -> Author:
-        """ Dodaje nowego autora do biblioteki
-        Args:
-            first_name (str): Imię autora
-            last_name (str): Nazwisko autora
-        Returns:
-            Author: Nowo utworzony obiekt Author
-        Efekt:
-            - Zapisuje autora w `self.authors` z automatycznie przypisanym identyfikatorem
-            - Inkrementuje `self._next_author_id`
-        """
-        author_id = self._next_author_id
-        author = Author(author_id, first_name, last_name)
-        self.authors[self._next_author_id] = author
-        self._next_author_id += 1
-        return author
+    def dodaj_autora(self, autor_id: int, imie: str, nazwisko: str) -> Autor:
+        autor = Autor(autor_id, imie, nazwisko)
+        self.autorzy.append(autor)
+        return autor
 
-    # task_1
-    def add_book(self, author_id: int, isbn: str, title: str, year: int) -> Book:
-        """
-        Dodaje nową książkę do biblioteki. Autor musi istnieć przed książką
+    def dodaj_ksiazke(self, isbn: str, tytul: str, autor_id: int) -> Optional[Ksiazka]:
+        autor = next((a for a in self.autorzy if a.autor_id == autor_id), None)
+        if not autor: return None
+        ksiazka = Ksiazka(isbn, tytul, autor)
+        self.ksiazki.append(ksiazka)
+        return ksiazka
 
-        Raises:
-            ValueError: Jeśli autor o podanym ID nie istnieje w systemie
-        """
-        if author_id not in self.authors:
-            raise ValueError(f"Nie można dodać książki. Autor o ID {author_id} nie istnieje.")
+    def dodaj_czytelnika(self, czytelnik_id: int, imie: str, nazwisko: str) -> Czytelnik:
+        czytelnik = Czytelnik(czytelnik_id, imie, nazwisko)
+        self.czytelnicy.append(czytelnik)
+        return czytelnik
 
-        author_object = self.authors[author_id]
-        book_id = self._next_book_id
+    def wypozycz_ksiazke(self, isbn: str, czytelnik_id: int) -> Optional[Wypozyczenie]:
+        czytelnik = next((c for c in self.czytelnicy if c.czytelnik_id == czytelnik_id), None)
+        if not czytelnik: return None
+        nowe_wyp = Wypozyczenie(self._nastepne_wypozyczenie_id, czytelnik_id, isbn)
+        self._nastepne_wypozyczenie_id += 1
+        self.wypozyczenia.append(nowe_wyp)
+        czytelnik.aktywne_wypozyczenia.append(nowe_wyp)
+        return nowe_wyp
 
-        book = Book(book_id, isbn, title, author_object, year)
-        self.books[book_id] = book
-        self._next_book_id += 1
-        return book
-
-    # task_1
-    def add_reader(self, first_name: str, last_name: str, email: str) -> Reader:
-        """
-        Dodaje nowego czytelnika do biblioteki
-        """
-        reader_id = self._next_reader_id
-        reader = Reader(reader_id, first_name, last_name, email)
-
-        self.readers[reader_id] = reader
-        self._next_reader_id += 1
-        return reader
-
-    # task_1
-    def find_reader_by_last_name(self, last_name: str) -> List[Reader]:
-        """
-        Wyszukuje czytelników po nazwisku (wielkość liter nie ma znaczenia).
-        Może zwrócić więcej niż jednego czytelnika o tym samym nazwisku.
-        """
-        found_readers = []
-        for reader in self.readers.values():
-            if reader.last_name.lower() == last_name.lower():
-                found_readers.append(reader)
-        return found_readers
-
-    # task_1
-    def find_author_by_last_name(self, last_name: str) -> List[Author]:
-        """
-        Wyszukuje autorów po nazwisku (wielkość liter nie ma znaczenia).
-        Może zwrócić więcej niż jednego autora o tym samym nazwisku.
-        """
-        found_authors = []
-        for author in self.authors.values():
-            if author.last_name.lower() == last_name.lower():
-                found_authors.append(author)
-        return found_authors
-
-    # task_2
-    def rent_book(self, isbn: str, reader_id: int) -> BookRental:
-        """Wypożycza dostępny egzemplarz książki czytelnikowi.
-
-        Czytelnik może mieć maksymalnie jedno aktywne wypożyczenie książki
-        z tym samym numerem ISBN.
-        """
-        # find_reader, walidacja
-        if reader_id not in self.readers:
-            raise ValueError(f"Czytelnik o ID {reader_id} nie istnieje.")
-        reader = self.readers[reader_id]
-
-        if self.find_book_rental_by_isbn_and_reader_id(isbn, reader_id) is not None:
-            raise ValueError("Czytelnik ma już aktywne wypożyczenie książki z tym ISBN.")
-
-        # find_available, walidacja
-        book = self._find_available_book_by_isbn(isbn)
-        if book is None:
-            raise ValueError(f"Brak dostępnego egzemplarza książki o ISBN {isbn}.")
-
-        # new BookRental(), wypożyczenie
-        rental = BookRental(book, reader, datetime.now())
-        self.rentals[self._next_book_rental_id] = rental
-        self._next_book_rental_id += 1
-
-        # oznacz książkę jako wypożyczona
-        book.change_availability(False)
-        return rental
-
-    # task_2
-    def _find_available_book_by_isbn(self, isbn: str) -> Optional[Book]:
-        """Zwraca pierwszy dostępny egzemplarz książki o podanym ISBN."""
-        for book in self.books.values():
-            if book.isbn == isbn and book.is_available:
-                return book
+   
+    def wyszukaj_numer_wypozyczenia(self, isbn: str, czytelnik_id: int) -> Optional[int]:
+        for wyp in self.wypozyczenia:
+            if wyp.isbn == isbn and wyp.czytelnik_id == czytelnik_id and wyp.status == "aktywne":
+                return wyp.wypozyczenie_id
         return None
 
-    # task_2
-    def find_book_by_isbn(self, isbn: str) -> List[Book]:
-        """Wyszukuje wszystkie egzemplarze książki o podanym ISBN."""
-        return [book for book in self.books.values() if book.isbn == isbn]
+    def zwroc_ksiazke(self, wypozyczenie_id: int) -> bool:
+        wypozyczenie = next((w for w in self.wypozyczenia if w.wypozyczenie_id == wypozyczenie_id and w.status == "aktywne"), None)
+        if not wypozyczenie: return False
+        wypozyczenie.status = "zwrócono"
+        czytelnik = next((c for c in self.czytelnicy if c.czytelnik_id == wypozyczenie.czytelnik_id), None)
+        if czytelnik:
+            czytelnik.aktywne_wypozyczenia = [w for w in czytelnik.aktywne_wypozyczenia if w.wypozyczenie_id != wypozyczenie_id]
+        return True
 
-    # task_2
-    def find_book_rental_by_isbn_and_reader_id(self, isbn: str, reader_id: int) -> Optional[BookRental]:
-        """Wyszukuje aktywne wypożyczenie książki po ISBN i ID czytelnika."""
-        for rental in self.rentals.values():
-            if rental.is_active and rental.reader.id == reader_id and rental.book.isbn == isbn:
-                return rental
-        return None
-
-    # task_3
-    def return_book(self, book_rental_id: int) -> None:
-        pass
-
-    # task_4
-    def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
-        pass
+    def wyszukaj_czytelnika_po_id(self, czytelnik_id: int) -> Optional[Czytelnik]:
+        return next((c for c in self.czytelnicy if c.czytelnik_id == czytelnik_id), None)
