@@ -215,6 +215,15 @@ class ConsoleController:
         try:
             reader_id = int(reader_id_str)
             rental_id = self.library.find_rental_id(reader_id, isbn)
+            
+            # Kod z Tasku 4 - wyswietlanie aktywnych wypozyczen
+            active_rentals = self.library.get_active_rentals_for_reader(reader.id)
+            if active_rentals:
+                print("   Aktywne wypożyczenia:")
+                for rental in active_rentals:
+                    print(f"   - Książka: {rental.book.title}, ISBN: {rental.book.isbn}")
+            else:
+                print("   Brak aktywnych wypożyczeń.")
 
             if rental_id is None:
                 print(f"Nie znaleziono aktywnego wypożyczenia dla czytelnika {reader_id} i ISBN {isbn}.")
