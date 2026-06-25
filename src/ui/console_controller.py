@@ -70,12 +70,15 @@ class ConsoleController:
         while True:
             print("\n--- Wypożyczenie: wybierz typ rekordu ---")
             print("1. Książka")
+            print("2. Zwróć książkę")
             print("0. Powrót do menu głównego")
             choice = input("Wybierz akcję: ").strip()
             if choice == "0":
                 return
             elif choice == "1":
                 self._rent_book()
+            elif choice == "2":  # Dodaj ten blok
+                self._return_book()
             else:
                 print("Nieprawidłowa opcja w menu Wypożyczenie.")
 
@@ -162,6 +165,11 @@ class ConsoleController:
             print(f"Znalezieni czytelnicy ({len(readers)}):")
             for reader in readers:
                 print(f"- ID: {reader.id} | {reader.get_full_name()} | E-mail: {reader.email}")
+                active_rentals = [r for r in self.library.rentals.values() if r.reader.id == reader.id and r.is_active]
+                if active_rentals:
+                    print("  Aktualnie wypożyczone książki:")
+                    for rental in active_rentals:
+                        print(f"  * {rental.book.title} (ISBN: {rental.book.isbn})")
 
     def _search_book(self) -> None:
         print("\n-- Wyszukiwanie książki po ISBN --")
@@ -194,3 +202,29 @@ class ConsoleController:
             print(f"Wypożyczono książkę '{rental.book.title}' czytelnikowi {rental.reader.get_full_name()}.")
         except ValueError as exc:
             print("Nie można wypożyczyć książki:", exc)
+
+    def _return_book(self) -> None:
+        print("\n-- Zwrot książki --")
+        isbn = input("Podaj numer ISBN zwracanej książki: ").strip()
+        reader_id_str = input("Podaj ID czytelnika: ").strip()
+
+        if not isbn or not reader_id_str:
+            print("ISBN i ID czytelnika są wymagane.")
+            return
+
+        try:
+            reader_id = int(reader_id_str)
+            rental_id = self.library.find_rental_id(reader_id, isbn)
+
+            if rental_id is None:
+                print(f"Nie znaleziono aktywnego wypożyczenia dla czytelnika {reader_id} i ISBN {isbn}.")
+                return
+
+            self.library.return_book(rental_id)
+            print(f"Książka o ISBN {isbn} została pomyślnie zwrócona.")
+
+        except ValueError as exc:
+            print("Wystąpił błąd podczas zwrotu:", exc)
+        except Exception as exc:
+            print("Wystąpił nieoczekiwany błąd:", exc)
+
