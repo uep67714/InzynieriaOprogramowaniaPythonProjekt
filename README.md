@@ -1,14 +1,24 @@
-[//]: # (task_4)
-# task_4:
+# System Zarządzania Biblioteką
 
-# Rozszerzenie widoku czytelnika (wyszukania czytelnika) o jego aktywne wypożyczenia
+## Opis Projektu
 
-# Testy integracyjne:
+Celem jest stworzenie systemu wspierającego proces wypożyczania książek, zarządzania zbiorami oraz bazą czytelników.
 
-# 1. zweryfikować cały przepływ (scenariusz pozytywny):
+## Funkcjonalności
 
-# dodanie autora/książki/czytelnika, wypożyczenie, wyszukiwanie numeru wypożyczenia, zwrot
+- Dodawanie nowych książek, autorów i czytelników do bazy danych.
+- Obsługa procesu wypoMocne strony:
+- Wyszukiwanie wypożyczeń oraz obsługa zwrotów.
+- Weryfikacja ograniczeń.
 
-# 2. Wypożyczenie gdy brak egzemplarzy (scenariusz negatywny)
+## Struktura Działania
 
-# 3. Ograniczenie: ten sam czytelnik nie może mieć dwóch egzemplarzy tego samego ISBN (sprawdzenie walidacji)
+System opiera się na architekturze modularnej, gdzie poszczególne klasy odpowiadają za element systemu (Książka, Czytelnik, Wypożyczenie). Procesy walidacji są zintegrowane bezpośrednio w logice wypożyczania.
+
+## Opis Zespołu i Podział Zadań
+
+- **Jesika Księżniakiewicz (Task 1)** – Implementacja modułu zarządzania autorami i książkami.
+- **Mateusz Marciniak (Task 2)** – Logika biznesowa systemu wypożyczeń.
+- **Viktoriia Tyshchenko (Task 3)** – Implementacja walidacji wypożyczeń oraz wyszukiwarka czytelników.
+- **Anna Wyrwał (Task 4)** – Rozszerzenie widoku czytelnika, testy integracyjne oraz dokumentacja projektu.
+- **Maciej Gryszkiewicz** – Setup projektu, podział prac, definicja modeli.
