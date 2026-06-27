@@ -180,7 +180,9 @@ class Library:
         rental.book.change_availability(True)
         rental.is_active = False
 
-
-    # task_4
-    def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
-        pass
+        # task_4
+        def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
+            """Zwraca listę aktywnych wypożyczeń dla czytelnika o podanym ID."""
+            if reader_id not in self.readers:
+                raise ValueError(f"Czytelnik o ID {reader_id} nie istnieje.")
+            return [r for r in self.rentals.values() if r.reader.id == reader_id and r.is_active]
