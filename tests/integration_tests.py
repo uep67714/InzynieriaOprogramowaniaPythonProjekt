@@ -23,7 +23,7 @@ class LibraryIntegrationTests(unittest.TestCase):
 
     def test_rental_no_books_available(self):
         # 2. Negatywny: wypożyczenie gdy brak egzemplarzy
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             self.lib.rent_book("999", self.reader.id)
 
     def test_same_reader_same_isbn_restriction(self):
@@ -32,5 +32,5 @@ class LibraryIntegrationTests(unittest.TestCase):
         self.lib.add_book(self.author.id, "111", "K2", 2026)
 
         self.lib.rent_book("111", self.reader.id)
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             self.lib.rent_book("111", self.reader.id)

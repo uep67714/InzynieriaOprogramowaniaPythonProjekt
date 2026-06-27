@@ -116,8 +116,6 @@ class ConsoleController:
 
             book = self.library.add_book(author_id, isbn, title, year)
             print(f"Dodano książkę: '{book.title}' o numerze ISBN: {book.isbn} (ID egzemplarza: {book.id})")
-        except ValueError:
-            print("Błąd: ID autora oraz rok wydania muszą być liczbami całkowitymi!")
         except Exception as exc:
             print("Wystąpił błąd podczas dodawania książki:", exc)
 
@@ -200,7 +198,7 @@ class ConsoleController:
             reader_id = int(reader_id_str)
             rental = self.library.rent_book(isbn, reader_id)
             print(f"Wypożyczono książkę '{rental.book.title}' czytelnikowi {rental.reader.get_full_name()}.")
-        except ValueError as exc:
+        except Exception as exc:
             print("Nie można wypożyczyć książki:", exc)
 
     def _return_book(self) -> None:
@@ -216,8 +214,7 @@ class ConsoleController:
             reader_id = int(reader_id_str)
             rental_id = self.library.find_rental_id(reader_id, isbn)
             
-            # Kod z Tasku 4 - wyswietlanie aktywnych wypozyczen
-            active_rentals = self.library.get_active_rentals_for_reader(reader.id)
+            active_rentals = self.library.get_active_rentals_for_reader(reader_id)
             if active_rentals:
                 print("   Aktywne wypożyczenia:")
                 for rental in active_rentals:
@@ -231,9 +228,6 @@ class ConsoleController:
 
             self.library.return_book(rental_id)
             print(f"Książka o ISBN {isbn} została pomyślnie zwrócona.")
-
-        except ValueError as exc:
-            print("Wystąpił błąd podczas zwrotu:", exc)
         except Exception as exc:
             print("Wystąpił nieoczekiwany błąd:", exc)
 

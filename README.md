@@ -7,9 +7,8 @@ Celem jest stworzenie systemu wspierającego proces wypożyczania książek, zar
 ## Funkcjonalności
 
 - Dodawanie nowych książek, autorów i czytelników do bazy danych.
-- Obsługa procesu wypoMocne strony:
+- Obsługa procesu wypożyczenia książki dla konkretnego czytelnika.
 - Wyszukiwanie wypożyczeń oraz obsługa zwrotów.
-- Weryfikacja ograniczeń.
 
 ## Struktura Działania
 
@@ -17,8 +16,8 @@ System opiera się na architekturze modularnej, gdzie poszczególne klasy odpowi
 
 ## Opis Zespołu i Podział Zadań
 
-- **Jesika Księżniakiewicz (Task 1)** – Implementacja modułu zarządzania autorami i książkami.
-- **Mateusz Marciniak (Task 2)** – Logika biznesowa systemu wypożyczeń.
-- **Viktoriia Tyshchenko (Task 3)** – Implementacja walidacji wypożyczeń oraz wyszukiwarka czytelników.
-- **Anna Wyrwał (Task 4)** – Rozszerzenie widoku czytelnika, testy integracyjne oraz dokumentacja projektu.
+- **Jesika Księżniakiewicz** – Implementacja modułu zarządzania autorami i książkami.
+- **Mateusz Marciniak** – Logika biznesowa systemu wypożyczeń.
+- **Viktoriia Tyshchenko** – Implementacja walidacji wypożyczeń oraz wyszukiwarka czytelników.
+- **Anna Wyrwał** – Rozszerzenie widoku czytelnika, testy integracyjne oraz dokumentacja projektu.
 - **Maciej Gryszkiewicz** – Setup projektu, podział prac, definicja modeli.

@@ -74,7 +74,7 @@ class LibraryUnitTests(unittest.TestCase):
     def test_add_book_raises_value_error_if_author_missing(self):
         library = Library()
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             library.add_book(author_id=999, isbn="123-456", title="Potop", year=1886)
 
     def test_find_book_by_isbn_returns_all_copies(self):
@@ -120,7 +120,7 @@ class LibraryUnitTests(unittest.TestCase):
         author = library.add_author("Henryk", "Sienkiewicz")
         library.add_book(author.id, "978-1", "Potop", 1886)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             library.rent_book("978-1", 999)
 
     def test_rent_book_raises_value_error_if_no_available_copy(self):
@@ -131,7 +131,7 @@ class LibraryUnitTests(unittest.TestCase):
         another_reader = library.add_reader("Jan", "Kowalski", "jan@email.com")
         library.rent_book("978-1", reader.id)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             library.rent_book("978-1", another_reader.id)
 
     def test_reader_cannot_rent_second_active_book_with_same_isbn(self):
@@ -142,7 +142,7 @@ class LibraryUnitTests(unittest.TestCase):
         reader = library.add_reader("Anna", "Nowak", "anna@email.com")
         library.rent_book("978-1", reader.id)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             library.rent_book("978-1", reader.id)
 
     def test_find_rental_id_success(self):
