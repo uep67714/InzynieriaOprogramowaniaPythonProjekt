@@ -33,16 +33,15 @@ class Library:
         self._next_author_id += 1
         return author
 
-    # task_1
     def add_book(self, author_id: int, isbn: str, title: str, year: int) -> Book:
         """
         Dodaje nową książkę do biblioteki. Autor musi istnieć przed książką
 
         Raises:
-            ValueError: Jeśli autor o podanym ID nie istnieje w systemie
+            Exception: Jeśli autor o podanym ID nie istnieje w systemie
         """
         if author_id not in self.authors:
-            raise ValueError(f"Nie można dodać książki. Autor o ID {author_id} nie istnieje.")
+            raise Exception(f"Nie można dodać książki. Autor o ID {author_id} nie istnieje.")
 
         author_object = self.authors[author_id]
         book_id = self._next_book_id
@@ -52,7 +51,6 @@ class Library:
         self._next_book_id += 1
         return book
 
-    # task_1
     def add_reader(self, first_name: str, last_name: str, email: str) -> Reader:
         """
         Dodaje nowego czytelnika do biblioteki
@@ -64,7 +62,6 @@ class Library:
         self._next_reader_id += 1
         return reader
 
-    # task_1
     def find_reader_by_last_name(self, last_name: str) -> List[Reader]:
         """
         Wyszukuje czytelników po nazwisku (wielkość liter nie ma znaczenia).
@@ -76,7 +73,6 @@ class Library:
                 found_readers.append(reader)
         return found_readers
 
-    # task_1
     def find_author_by_last_name(self, last_name: str) -> List[Author]:
         """
         Wyszukuje autorów po nazwisku (wielkość liter nie ma znaczenia).
@@ -88,7 +84,6 @@ class Library:
                 found_authors.append(author)
         return found_authors
 
-    # task_2
     def rent_book(self, isbn: str, reader_id: int) -> BookRental:
         """Wypożycza dostępny egzemplarz książki czytelnikowi.
 
@@ -97,16 +92,16 @@ class Library:
         """
         # find_reader, walidacja
         if reader_id not in self.readers:
-            raise ValueError(f"Czytelnik o ID {reader_id} nie istnieje.")
+            raise Exception(f"Czytelnik o ID {reader_id} nie istnieje.")
         reader = self.readers[reader_id]
 
         if self.find_book_rental_by_isbn_and_reader_id(isbn, reader_id) is not None:
-            raise ValueError("Czytelnik ma już aktywne wypożyczenie książki z tym ISBN.")
+            raise Exception("Czytelnik ma już aktywne wypożyczenie książki z tym ISBN.")
 
         # find_available, walidacja
         book = self._find_available_book_by_isbn(isbn)
         if book is None:
-            raise ValueError(f"Brak dostępnego egzemplarza książki o ISBN {isbn}.")
+            raise Exception(f"Brak dostępnego egzemplarza książki o ISBN {isbn}.")
 
         # new BookRental(), wypożyczenie
         rental = BookRental(book, reader, datetime.now())
@@ -117,7 +112,6 @@ class Library:
         book.change_availability(False)
         return rental
 
-    # task_2
     def _find_available_book_by_isbn(self, isbn: str) -> Optional[Book]:
         """Zwraca pierwszy dostępny egzemplarz książki o podanym ISBN."""
         for book in self.books.values():
@@ -125,12 +119,10 @@ class Library:
                 return book
         return None
 
-    # task_2
     def find_book_by_isbn(self, isbn: str) -> List[Book]:
         """Wyszukuje wszystkie egzemplarze książki o podanym ISBN."""
         return [book for book in self.books.values() if book.isbn == isbn]
 
-    # task_2
     def find_book_rental_by_isbn_and_reader_id(self, isbn: str, reader_id: int) -> Optional[BookRental]:
         """Wyszukuje aktywne wypożyczenie książki po ISBN i ID czytelnika."""
         for rental in self.rentals.values():
@@ -138,7 +130,6 @@ class Library:
                 return rental
         return None
 
-    # task_3
     def find_rental_id(self, reader_id: int, isbn: str) -> Optional[int]:
         """
                 Wyszukuje ID aktywnego wypożyczenia na podstawie ID czytelnika i ISBN książki.
@@ -158,7 +149,6 @@ class Library:
         return None
 
 
-    # task_3
     def return_book(self, book_rental_id: int) -> None:
         """
         Rejestruje zwrot książki na podstawie ID wypożyczenia.
@@ -168,21 +158,20 @@ class Library:
             book_rental_id: ID wypożyczenia.
 
         Raises:
-            ValueError: Jeśli wypożyczenie nie istnieje lub książka już jest zwrócona.
+            Exception: Jeśli wypożyczenie nie istnieje lub książka już jest zwrócona.
         """
         if book_rental_id not in self.rentals:
-            raise ValueError(f"Wypożyczenie o ID {book_rental_id} nie istnieje.")
+            raise Exception(f"Wypożyczenie o ID {book_rental_id} nie istnieje.")
         rental = self.rentals[book_rental_id]
 
         if not rental.is_active:
-            raise ValueError(f"Książka z wypożyczenia o ID {book_rental_id} została już zwrócona.")
+            raise Exception(f"Książka z wypożyczenia o ID {book_rental_id} została już zwrócona.")
 
         rental.book.change_availability(True)
         rental.is_active = False
 
-        # task_4
-        def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
-            """Zwraca listę aktywnych wypożyczeń dla czytelnika o podanym ID."""
-            if reader_id not in self.readers:
-                raise ValueError(f"Czytelnik o ID {reader_id} nie istnieje.")
-            return [r for r in self.rentals.values() if r.reader.id == reader_id and r.is_active]
+    def get_active_rentals_for_reader(self, reader_id: int) -> List[BookRental]:
+        """Zwraca listę aktywnych wypożyczeń dla czytelnika o podanym ID."""
+        if reader_id not in self.readers:
+            raise Exception(f"Czytelnik o ID {reader_id} nie istnieje.")
+        return [r for r in self.rentals.values() if r.reader.id == reader_id and r.is_active]

@@ -12,7 +12,3 @@ class BookRental:
         self.rental_date: datetime = rental_date
         self.return_date: Optional[datetime] = None
         self.is_active: bool = True
-
-    def complete_rental(self, return_date: datetime) -> None:
-        # task_3
-        pass
